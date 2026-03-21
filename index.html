@@ -102,7 +102,7 @@
     const PROJECT_STN = "Filestream-CF";
 
     // Destination
-    const PROJECT_URL = "worker.js";
+    const PROJECT_URL = "./worker.js";
 
     // Constants
     const PLACEHOLDERS = [
@@ -188,11 +188,13 @@
     };
 
     // Validate input based on placeholder type
-    const validateInput = (value, type) => {
-      if (value.trim() === '') return false; // Check for empty values
-      if (type === 'number') return !isNaN(value);
+    const validateInput = (value, type, name) => {
+      if (value.trim() === '') return false;
+      if (type === 'number') return /^-?\d+$/.test(value.trim());
       if (type === 'boolean') return value === 'true' || value === 'false';
-      return true; // Strings are always valid
+      if (name === 'BOT_WEBHOOK') return value.startsWith('/');
+      if (name === 'BOT_SECRET') return /^[A-Za-z0-9_-]+$/.test(value);
+      return true;
     };
 
     // Check if all fields are valid
@@ -202,7 +204,7 @@
         const inputValue = document.getElementById(placeholder.name)?.value;
         const errorElement = document.getElementById(`${placeholder.name}-error`);
 
-        if (!validateInput(inputValue, placeholder.type)) {
+        if (!validateInput(inputValue, placeholder.type, placeholder.name)) {
           isValid = false;
           errorElement.classList.remove('hidden');
           document.getElementById(placeholder.name).classList.add('border-red-500');
